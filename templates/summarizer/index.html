@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Summarizer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+      .container {
+        width: 80%;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      textarea {
+        width: 100%;
+        height: 150px;
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+      }
+      button {
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      button:hover {
+        background-color: #004494;
+      }
+      h1 {
+        color: #333;
+      }
+      p {
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Text Summarizer</h1>
+      <form id="summarizerForm" method="post">
+        <textarea
+          id="inputText"
+          name="text"
+          placeholder="Enter text here..."
+        ></textarea>
+        <button type="button" onclick="submitText()">Summarize Text</button>
+      </form>
+      <h2>Summary:</h2>
+      <p id="outputText"></p>
+    </div>
+
+    <script>
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      function submitText() {
+        var text = document.getElementById("inputText").value;
+        var csrftoken = getCookie("csrftoken");
+
+        fetch("/summarizer/summarize/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+          },
+          body: JSON.stringify({ text: text }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("outputText").innerHTML = data.summary;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("outputText").innerHTML =
+              "Error: " + error.message;
+          });
+      }
+    </script>
+  </body>
+</html>
